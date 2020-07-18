@@ -59,9 +59,6 @@ object Form1: TForm1
       Filter = 'JPEG|*.jpg;*.jpeg|All files (*.*)|*.*'
       TabOrder = 0
       Text = ''
-      ExplicitLeft = 89
-      ExplicitTop = 3
-      ExplicitWidth = 874
       ExplicitHeight = 21
     end
   end
@@ -78,8 +75,6 @@ object Form1: TForm1
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
-    ExplicitLeft = 8
-    ExplicitWidth = 417
     object ImageAfterEffect: TImage
       Left = 0
       Top = 0
@@ -121,9 +116,9 @@ object Form1: TForm1
       end
       object miApplyNetwork: TMenuItem
         Caption = #1055#1088#1080#1084#1077#1085#1080#1090#1100' '#1085#1077#1081#1088#1086#1089#1077#1090#1100
-        OnClick = miApplyNetworkClick
         object N21: TMenuItem
           Caption = #1088#1072#1076#1080#1091#1089' 2'
+          OnClick = miApplyNetworkClick
         end
       end
     end
