@@ -5,9 +5,11 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, JvExMask, JvToolEdit, Vcl.ExtCtrls,
-  DIB, XALGLIB, UITypes, Vcl.Menus, U_VectorList, IOUtils, math;
+  DIB, XALGLIB, UITypes, Vcl.Menus, U_VectorList, IOUtils, math, U_TrainProgressForm,
+  U_WMUtils, U_NeuralTrainerThread, JclSysInfo, U_SetNetworkParametersForm;
 
 type
+
   TForm1 = class(TForm)
     DXDIBSrc: TDXDIB;
     ScrollBoxSrc: TScrollBox;
@@ -37,6 +39,9 @@ type
     miStartNeuroTrainRadius2: TMenuItem;
     miStartNeuroTrainRadius3: TMenuItem;
     miGenerateVariant2: TMenuItem;
+    miStartNeuroTrainRadius4: TMenuItem;
+    N31: TMenuItem;
+    N41: TMenuItem;
     procedure JvFilenameEditAfterDialog(Sender: TObject; var AName: string; var AAction: Boolean);
     procedure btGenerateClick(Sender: TObject);
     procedure N1x1Click(Sender: TObject);
@@ -49,13 +54,27 @@ type
     procedure miApplyNetworkClick(Sender: TObject);
     procedure miStartNeuroTrainRadius2Click(Sender: TObject);
     procedure miStartNeuroTrainRadius3Click(Sender: TObject);
+    procedure miStartNeuroTrainRadius4Click(Sender: TObject);
     procedure miGenerateVariant2Click(Sender: TObject);
+    procedure N31Click(Sender: TObject);
+    procedure N41Click(Sender: TObject);
   private
     procedure GenerateImages(SquareLen, SquareCount: Integer);
+    procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
+    procedure RunTraining(aRadius: byte; nhid1, nhid2: Cardinal);
+    procedure ApplyNetworkRadiusX(aRadius: word);
     { Private declarations }
   public
     { Public declarations }
-    FNetwork: Tmultilayerperceptron;
+    // текущие используемые объекты (using objects)
+    FNetworkSrc: Tmultilayerperceptron; // исходный объект нейросети
+    FNetwork: Tmultilayerperceptron; // результирующая обученная нейросеть
+    Frep: Tmlpreport;
+    Finfo: NativeInt;
+    FMatrix: TMatrix;
+    FRunnedThreads: Integer; // всего запущено потоков
+    FDoneThreadCount: Integer; // завершённых потоков
+    FFileName: string;
     procedure ReDrawImages;
   end;
 
@@ -164,21 +183,13 @@ begin
   FreeAndNil(zVectorList);
 end;
 
-function GetNetwork(aMatrix: TMatrix): Tmultilayerperceptron;
+function GetNetwork(aMatrix: TMatrix; nhid1, nhid2: Cardinal): Tmultilayerperceptron;
 var
   trn: Tmlptrainer;
-  rep: Tmlpreport;
-  info: NativeInt;
 begin
   mlpcreatetrainer(Length(aMatrix[0]) - 1, 1, trn);
   mlpsetdataset(trn, aMatrix, Length(aMatrix));
-  mlpcreateb2(Length(aMatrix[0]) - 1, Length(aMatrix[0]) - 1, Length(aMatrix[0]) - 1, 1, 0, 0, result);
-  mlptrainlm(result, aMatrix, Length(aMatrix), 0.001, 100, info, rep);
-  TFile.WriteAllText(ExtractFilePath(ParamStr(0)) + 'current.rep', 
-    Format('info: %d, relclserror: %f, avgce: %f, rmserror: %f, avgerror: %f, avgrelerror: %f, ngrad: %d, nhess: %d, ncholesky: %d',
-    [info, 
-    rep.relclserror, rep.avgce, rep.rmserror, rep.avgerror, rep.avgrelerror, 
-    rep.ngrad, rep.nhess, rep.ncholesky]));
+  mlpcreateb2(Length(aMatrix[0]) - 1, nhid1, nhid2, 1, 0, 0, result);
 end;
 
 procedure TForm1.btGenerateClick(Sender: TObject);
@@ -197,53 +208,68 @@ begin
   end;
 end;
 
-procedure TForm1.miApplyNetworkClick(Sender: TObject);
+procedure TForm1.MessageReceiver(var msg: TMessage);
 var
-  x, y: Integer;
-  x1, y1: Integer;
-  count: Integer;
-  zVectR, zVectG, zVectB, zVectYR, zVectYG, zVectYB: TVector;
-  zColor: Cardinal;
+  zThread: TNeuralTrainerThread;
+  zstr: ansistring;
+begin
+  //
+  zThread := TNeuralTrainerThread(msg.WParam);
+  Frep := zThread.rep;
+  Finfo := zThread.info;
+  // отобразим результат
+  TrainProgressForm.AddResults(Frep, Finfo);
+
+  // если до этого момента не было обученной сети - то присвоим
+  if (not Assigned(FNetwork)) then
+  begin
+    FNetwork := zThread.FNetwork;
+
+    TFile.AppendAllText(zThread.FInfoFileName, 
+      Format('time: %s, info: %d, relclserror: %e, avgce: %e, rmserror: %e, avgerror: %e, avgrelerror: %e, ngrad: %d, nhess: %d, ncholesky: %d'#13#10,
+      [DateTimeToStr(Now), Finfo, 
+      Frep.relclserror, Frep.avgce, Frep.rmserror, Frep.avgerror, Frep.avgrelerror, 
+      Frep.ngrad, Frep.nhess, Frep.ncholesky]), TEncoding.UTF8);
+    mlpserialize(FNetwork, zstr);
+    TFile.WriteAllText(zThread.FNetworkFileName, string(zstr));
+  end
+  else
+    if (zThread.rep.rmserror < Frep.rmserror) then
+  begin
+    FreeAndNil(FNetwork);
+    FNetwork := zThread.FNetwork;
+
+    TFile.AppendAllText(zThread.FInfoFileName, 
+      Format('time: %s, info: %d, relclserror: %e, avgce: %e, rmserror: %e, avgerror: %e, avgrelerror: %e, ngrad: %d, nhess: %d, ncholesky: %d'#13#10,
+      [DateTimeToStr(Now), Finfo, 
+      Frep.relclserror, Frep.avgce, Frep.rmserror, Frep.avgerror, Frep.avgrelerror, 
+      Frep.ngrad, Frep.nhess, Frep.ncholesky]), TEncoding.UTF8);
+    mlpserialize(FNetwork, zstr);
+    TFile.WriteAllText(zThread.FNetworkFileName, string(zstr));
+  end
+  else
+  begin
+    FreeAndNil(zThread.FNetwork);
+  end;
+
+  zThread.Free;
+
+  // если процесс обучения не прервыан - то запустим ещё один поток
+  if (TrainProgressForm.FTrainMode = tmRun) then
+  begin
+    if (zThread.rep.rmserror > 0) then
+      TNeuralTrainerThread.Create(FNetworkSrc.Clone, Clone(FMatrix),
+        FFileName + '.network', FFileName + '.info')
+    else
+      TrainProgressForm.FTrainMode := tmNone;
+  end;
+end;
+
+procedure TForm1.miApplyNetworkClick(Sender: TObject);
 begin
   if (Assigned(FNetwork)) then
   begin
-    Screen.Cursor := crHourGlass;
-    SetLength(zVectR, 25);
-    SetLength(zVectG, 25);
-    SetLength(zVectB, 25);
-    SetLength(zVectYR, 1);
-    SetLength(zVectYG, 1);
-    SetLength(zVectYB, 1);
-    with DXDIBSrc do
-      for y := 2 to DIB.Height - 3 do
-        for x := 2 to DIB.Width - 3 do
-        begin
-          // calc R, G, B
-          count := 0;
-          for y1 := y - 2 to y + 2 do
-            for x1 := x - 2 to x + 2 do
-            begin
-              zColor := DIB.Pixels[x1, y1];
-              zVectR[count] := GetRValue(zColor);
-              zVectG[count] := GetGValue(zColor);
-              zVectB[count] := GetBValue(zColor);
-              inc(count);
-            end;
-          mlpprocess(FNetwork, zVectR, zVectYR);
-          mlpprocess(FNetwork, zVectG, zVectYG);
-          mlpprocess(FNetwork, zVectB, zVectYB);
-
-          DXDIBAfterEffect.DIB.Pixels[x, y] := RGB(GetAsByte(zVectYR[0]), GetAsByte(zVectYG[0]), GetAsByte(zVectYB[0]));
-        end;
-    SetLength(zVectR, 0);
-    SetLength(zVectG, 0);
-    SetLength(zVectB, 0);
-    SetLength(zVectYR, 0);
-    SetLength(zVectYG, 0);
-    SetLength(zVectYB, 0);
-
-    ReDrawImages;
-    Screen.Cursor := crDefault;
+    ApplyNetworkRadiusX(2);
   end;
 end;
 
@@ -281,33 +307,15 @@ begin
 end;
 
 procedure TForm1.miStartNeuroTrainRadius2Click(Sender: TObject);
-var
-  zMatrix: TMatrix;
-  zstr: ansistring;
 begin
-  //
-  Screen.Cursor := crHourGlass;
-  zMatrix := GetMatrix(DXDIBAfterEffect.DIB, DXDIBSrc.DIB, rect(2, 2, DXDIBSrc.DIB.Width - 3,
-    DXDIBSrc.DIB.Height - 3), 2);
-  FNetwork := GetNetwork(zMatrix);
-  mlpserialize(FNetwork, zstr);
-  TFile.WriteAllText(ExtractFilePath(ParamStr(0)) + 'current_radius_2.network', string(zstr));
-  Screen.Cursor := crDefault;
+  if (SetNetworkParametersForm.ShowModal = mrOk) then
+    RunTraining(2, StrToInt(SetNetworkParametersForm.edNHID1.Text), StrToInt(SetNetworkParametersForm.edNHID2.Text));
 end;
 
 procedure TForm1.miStartNeuroTrainRadius3Click(Sender: TObject);
-var
-  zMatrix: TMatrix;
-  zstr: ansistring;
 begin
-  //
-  Screen.Cursor := crHourGlass;
-  zMatrix := GetMatrix(DXDIBAfterEffect.DIB, DXDIBSrc.DIB, rect(3, 3, DXDIBSrc.DIB.Width - 4,
-    DXDIBSrc.DIB.Height - 4), 3);
-  FNetwork := GetNetwork(zMatrix);
-  mlpserialize(FNetwork, zstr);
-  TFile.WriteAllText(ExtractFilePath(ParamStr(0)) + 'current_radius_3.network', string(zstr));
-  Screen.Cursor := crDefault;
+  if (SetNetworkParametersForm.ShowModal = mrOk) then
+    RunTraining(3, StrToInt(SetNetworkParametersForm.edNHID1.Text), StrToInt(SetNetworkParametersForm.edNHID2.Text));
 end;
 
 procedure TForm1.N1x1Click(Sender: TObject);
@@ -323,12 +331,34 @@ begin
   ReDrawImages;
 end;
 
+procedure TForm1.N31Click(Sender: TObject);
+begin
+  if (Assigned(FNetwork)) then
+  begin
+    ApplyNetworkRadiusX(3);
+  end;
+end;
+
 procedure TForm1.N3x1Click(Sender: TObject);
 begin
   DXDIBAfterEffect.DIB.Blur(24, 1);
   DXDIBAfterEffect.DIB.Blur(24, 1);
   DXDIBAfterEffect.DIB.Blur(24, 1);
   ReDrawImages;
+end;
+
+procedure TForm1.miStartNeuroTrainRadius4Click(Sender: TObject);
+begin
+  if (SetNetworkParametersForm.ShowModal = mrOk) then
+    RunTraining(4, StrToInt(SetNetworkParametersForm.edNHID1.Text), StrToInt(SetNetworkParametersForm.edNHID2.Text));
+end;
+
+procedure TForm1.N41Click(Sender: TObject);
+begin
+  if (Assigned(FNetwork)) then
+  begin
+    ApplyNetworkRadiusX(4);
+  end;
 end;
 
 procedure TForm1.N4x1Click(Sender: TObject);
@@ -370,6 +400,89 @@ begin
     ImageAfterEffect.Picture.Bitmap.Canvas.StretchDraw(rect(0, 0, ImageAfterEffect.Width, ImageAfterEffect.Height),
       DXDIBAfterEffect.DIB);
   end;
+end;
+
+procedure TForm1.ApplyNetworkRadiusX(aRadius: word);
+var
+  zVectR: TVector;
+  zVectG: TVector;
+  zVectB: TVector;
+  zVectYR: TVector;
+  zVectYG: TVector;
+  zVectYB: TVector;
+  y: Integer;
+  x: Integer;
+  count: Integer;
+  y1: Integer;
+  x1: Integer;
+  zColor: Cardinal;
+begin
+  Screen.Cursor := crHourGlass;
+  SetLength(zVectR, sqr(aRadius + aRadius + 1));
+  SetLength(zVectG, sqr(aRadius + aRadius + 1));
+  SetLength(zVectB, sqr(aRadius + aRadius + 1));
+  SetLength(zVectYR, 1);
+  SetLength(zVectYG, 1);
+  SetLength(zVectYB, 1);
+  with DXDIBSrc do
+    for y := aRadius to DIB.Height - aRadius - 1 do
+      for x := aRadius to DIB.Width - aRadius - 1 do
+      begin
+        // calc R, G, B
+        count := 0;
+        for y1 := y - aRadius to y + aRadius do
+          for x1 := x - aRadius to x + aRadius do
+          begin
+            zColor := DIB.Pixels[x1, y1];
+            zVectR[count] := GetRValue(zColor);
+            zVectG[count] := GetGValue(zColor);
+            zVectB[count] := GetBValue(zColor);
+            inc(count);
+          end;
+        mlpprocess(FNetwork, zVectR, zVectYR);
+        mlpprocess(FNetwork, zVectG, zVectYG);
+        mlpprocess(FNetwork, zVectB, zVectYB);
+        DXDIBAfterEffect.DIB.Pixels[x, y] := RGB(GetAsByte(zVectYR[0]), GetAsByte(zVectYG[0]), GetAsByte(zVectYB[0]));
+      end;
+  SetLength(zVectR, 0);
+  SetLength(zVectG, 0);
+  SetLength(zVectB, 0);
+  SetLength(zVectYR, 0);
+  SetLength(zVectYG, 0);
+  SetLength(zVectYB, 0);
+  ReDrawImages;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TForm1.RunTraining(aRadius: byte; nhid1, nhid2: Cardinal);
+var
+  i: Integer;
+begin
+  // пока есть незавершённые потоки - не начинаем новый процесс
+  if (FRunnedThreads = FDoneThreadCount) then
+  begin
+    if (Assigned(FNetwork)) then
+      FreeAndNil(FNetwork);
+    FFileName := Format('%sradius_%d_nhid1_%d_nhid2_%d', [
+      ExtractFilePath(ParamStr(0)), aRadius, nhid1, nhid2]);
+    SetLength(FMatrix, 0);
+    TrainProgressForm.FTrainMode := tmRun;
+    Screen.Cursor := crHourGlass;
+    FMatrix := GetMatrix(DXDIBAfterEffect.DIB, DXDIBSrc.DIB, rect(aRadius, aRadius, 
+      DXDIBSrc.DIB.Width - aRadius - 1, DXDIBSrc.DIB.Height - aRadius - 1), aRadius);
+    FNetworkSrc := GetNetwork(FMatrix, nhid1, nhid2);
+    for i := 0 to ProcessorCount - 1 do
+    begin
+      TNeuralTrainerThread.Create(FNetworkSrc.Clone, Clone(FMatrix),
+        FFileName + '.network', FFileName + '.info');
+    end;
+    TrainProgressForm.StartNewTask;
+    TrainProgressForm.Show;
+    Screen.Cursor := crDefault;
+  end
+  else
+    MessageDlg('Предыдущий процесс обучения ещё не завершён', mtInformation, [mbOk], 0, mbOk);
+
 end;
 
 procedure TForm1.GenerateImages(SquareLen, SquareCount: Integer);
