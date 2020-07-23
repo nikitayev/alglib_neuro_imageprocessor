@@ -215,15 +215,15 @@ var
 begin
   //
   zThread := TNeuralTrainerThread(msg.WParam);
-  Frep := zThread.rep;
-  Finfo := zThread.info;
   // отобразим результат
-  TrainProgressForm.AddResults(Frep, Finfo);
+  TrainProgressForm.AddResults(zThread.rep, zThread.info);
 
   // если до этого момента не было обученной сети - то присвоим
   if (not Assigned(FNetwork)) then
   begin
     FNetwork := zThread.FNetwork;
+    Frep := zThread.rep;
+    Finfo := zThread.info;
 
     TFile.AppendAllText(zThread.FInfoFileName, 
       Format('time: %s, info: %d, relclserror: %e, avgce: %e, rmserror: %e, avgerror: %e, avgrelerror: %e, ngrad: %d, nhess: %d, ncholesky: %d'#13#10,
@@ -238,6 +238,8 @@ begin
   begin
     FreeAndNil(FNetwork);
     FNetwork := zThread.FNetwork;
+    Frep := zThread.rep;
+    Finfo := zThread.info;
 
     TFile.AppendAllText(zThread.FInfoFileName, 
       Format('time: %s, info: %d, relclserror: %e, avgce: %e, rmserror: %e, avgerror: %e, avgrelerror: %e, ngrad: %d, nhess: %d, ncholesky: %d'#13#10,

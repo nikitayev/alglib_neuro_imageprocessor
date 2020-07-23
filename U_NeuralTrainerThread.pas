@@ -22,7 +22,11 @@ type
       const aNetworkFileName, aInfoFileName: string);
   end;
 
+var
+  GStartCount: Integer = -1;
+
 implementation
+
 uses Forms;
 
 { 
@@ -69,9 +73,18 @@ begin
 end;
 
 procedure TNeuralTrainerThread.Execute;
+var
+  i: Integer;
 begin
   { Place thread code here }
+  // randomize network weights
+  inc(GStartCount);
+  for i := 0 to GStartCount - 1 do
+    mlprandomize(FNetwork);
+    
   mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
+  rep.rmserror := mlprmserror(FNetwork, FMatrix, Length(FMatrix));
+  // mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, 0.001, 300, info, rep);
   SetLength(FMatrix, 0);
   PostMessage(Application.MainForm.Handle, WM_EndOfTrain, NativeUInt(Self), 0);
 end;
