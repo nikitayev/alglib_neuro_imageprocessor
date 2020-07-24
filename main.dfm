@@ -167,11 +167,68 @@ object Form1: TForm1
         OnClick = miLoadNetworkClick
       end
     end
+    object N4: TMenuItem
+      Caption = #1048#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103
+      object miLoadFromFileLeft: TMenuItem
+        Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100' '#1083#1077#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077
+        OnClick = miLoadFromFileLeftClick
+      end
+      object miLoadFromFileRight: TMenuItem
+        Caption = #1047#1072#1075#1088#1091#1079#1080#1090#1100' '#1087#1088#1072#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077
+        OnClick = miLoadFromFileRightClick
+      end
+      object miCopyLeftImage: TMenuItem
+        Caption = #1057#1082#1086#1087#1080#1088#1086#1074#1072#1090#1100' '#1083#1077#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077
+        OnClick = miCopyLeftImageClick
+      end
+      object miCopyRightImage: TMenuItem
+        Caption = #1057#1082#1086#1087#1080#1088#1086#1074#1072#1090#1100' '#1087#1088#1072#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077
+        OnClick = miCopyRightImageClick
+      end
+      object miSaveLeftImageAsBMP: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1083#1077#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1074' BMP'
+        OnClick = miSaveLeftImageAsBMPClick
+      end
+      object miSaveRightImageAsBMP: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1087#1088#1072#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1074' BMP'
+        OnClick = miSaveRightImageAsBMPClick
+      end
+      object miSaveLeftImageAsJPEG: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1083#1077#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1074' JPEG'
+        OnClick = miSaveLeftImageAsJPEGClick
+      end
+      object miSaveRightImageAsJPEG: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1087#1088#1072#1074#1086#1077' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1074' JPEG'
+        OnClick = miSaveRightImageAsJPEGClick
+      end
+    end
   end
   object OpenDialogNetwork: TOpenDialog
     DefaultExt = '*.network'
     Options = [ofReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 328
     Top = 153
+  end
+  object OpenPictureDialogImage1: TOpenPictureDialog
+    DefaultExt = 'jpg'
+    Options = [ofReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 160
+    Top = 313
+  end
+  object OpenPictureDialogImage2: TOpenPictureDialog
+    DefaultExt = 'jpg'
+    Options = [ofReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 464
+    Top = 305
+  end
+  object SavePictureDialogImage1: TSavePictureDialog
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Left = 144
+    Top = 385
+  end
+  object SavePictureDialogImage2: TSavePictureDialog
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Left = 464
+    Top = 369
   end
 end

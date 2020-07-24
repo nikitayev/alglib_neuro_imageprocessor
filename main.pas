@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, JvExMask, JvToolEdit, Vcl.ExtCtrls,
   DIB, XALGLIB, UITypes, Vcl.Menus, U_VectorList, IOUtils, math, U_TrainProgressForm,
-  U_WMUtils, U_NeuralTrainerThread, JclSysInfo, U_SetNetworkParametersForm;
+  U_WMUtils, U_NeuralTrainerThread, JclSysInfo, U_SetNetworkParametersForm, Vcl.ExtDlgs,
+  Clipbrd, jpeg;
 
 type
 
@@ -42,6 +43,19 @@ type
     miStartNeuroTrainRadius4: TMenuItem;
     N31: TMenuItem;
     N41: TMenuItem;
+    N4: TMenuItem;
+    miLoadFromFileLeft: TMenuItem;
+    miLoadFromFileRight: TMenuItem;
+    miCopyLeftImage: TMenuItem;
+    miCopyRightImage: TMenuItem;
+    miSaveLeftImageAsBMP: TMenuItem;
+    miSaveRightImageAsBMP: TMenuItem;
+    miSaveLeftImageAsJPEG: TMenuItem;
+    miSaveRightImageAsJPEG: TMenuItem;
+    OpenPictureDialogImage1: TOpenPictureDialog;
+    OpenPictureDialogImage2: TOpenPictureDialog;
+    SavePictureDialogImage1: TSavePictureDialog;
+    SavePictureDialogImage2: TSavePictureDialog;
     procedure JvFilenameEditAfterDialog(Sender: TObject; var AName: string; var AAction: Boolean);
     procedure btGenerateClick(Sender: TObject);
     procedure N1x1Click(Sender: TObject);
@@ -58,6 +72,14 @@ type
     procedure miGenerateVariant2Click(Sender: TObject);
     procedure N31Click(Sender: TObject);
     procedure N41Click(Sender: TObject);
+    procedure miLoadFromFileLeftClick(Sender: TObject);
+    procedure miLoadFromFileRightClick(Sender: TObject);
+    procedure miCopyLeftImageClick(Sender: TObject);
+    procedure miCopyRightImageClick(Sender: TObject);
+    procedure miSaveLeftImageAsBMPClick(Sender: TObject);
+    procedure miSaveRightImageAsBMPClick(Sender: TObject);
+    procedure miSaveLeftImageAsJPEGClick(Sender: TObject);
+    procedure miSaveRightImageAsJPEGClick(Sender: TObject);
   private
     procedure GenerateImages(SquareLen, SquareCount: Integer);
     procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
@@ -275,6 +297,26 @@ begin
   end;
 end;
 
+procedure TForm1.miCopyLeftImageClick(Sender: TObject);
+var
+  MyFormat: word;
+  AData: THandle;
+  APalette: HPALETTE;
+begin
+  DXDIBSrc.DIB.SaveToClipboardFormat(MyFormat, AData, APalette);
+  ClipBoard.SetAsHandle(MyFormat, AData);
+end;
+
+procedure TForm1.miCopyRightImageClick(Sender: TObject);
+var
+  MyFormat: word;
+  AData: THandle;
+  APalette: HPALETTE;
+begin
+  DXDIBAfterEffect.DIB.SaveToClipboardFormat(MyFormat, AData, APalette);
+  ClipBoard.SetAsHandle(MyFormat, AData);
+end;
+
 procedure TForm1.miGenerateVariant1Click(Sender: TObject);
 begin
   GenerateImages(8, 4);
@@ -287,6 +329,26 @@ begin
   GenerateImages(16, 6);
 
   ReDrawImages;
+end;
+
+procedure TForm1.miLoadFromFileLeftClick(Sender: TObject);
+begin
+  if (OpenPictureDialogImage1.Execute(Self.Handle)) then
+    if (FileExists(OpenPictureDialogImage1.FileName)) then
+    begin
+      DXDIBSrc.DIB.LoadFromFile(OpenPictureDialogImage1.FileName);
+      ReDrawImages;
+    end;
+end;
+
+procedure TForm1.miLoadFromFileRightClick(Sender: TObject);
+begin
+  if (OpenPictureDialogImage2.Execute(Self.Handle)) then
+    if (FileExists(OpenPictureDialogImage2.FileName)) then
+    begin
+      DXDIBAfterEffect.DIB.LoadFromFile(OpenPictureDialogImage1.FileName);
+      ReDrawImages;
+    end;
 end;
 
 procedure TForm1.miLoadNetworkClick(Sender: TObject);
@@ -303,9 +365,71 @@ begin
   end;
 end;
 
+procedure TForm1.miSaveLeftImageAsBMPClick(Sender: TObject);
+begin
+  if (SavePictureDialogImage1.Execute(Self.Handle)) then
+  begin
+    DXDIBSrc.DIB.SaveToFile(SavePictureDialogImage1.FileName);
+  end;
+end;
+
+procedure TForm1.miSaveLeftImageAsJPEGClick(Sender: TObject);
+var
+  jpegimg: TJPEGImage;
+  bmp: TBitmap;
+begin
+  if (SavePictureDialogImage1.Execute(Self.Handle)) then
+  begin
+    jpegimg := TJPEGImage.Create;
+    bmp := TBitmap.Create;
+    try
+      bmp.SetSize(DXDIBSrc.DIB.Width, DXDIBSrc.DIB.Height);
+      bmp.Canvas.Draw(0, 0, DXDIBSrc.DIB);
+      jpegimg.CompressionQuality := 100;
+      jpegimg.Performance := jpeg.jpBestQuality;
+      jpegimg.Assign(bmp);
+      jpegimg.SaveToFile(SavePictureDialogImage1.FileName);
+    finally
+      FreeAndNil(jpegimg);
+      FreeAndNil(bmp);
+    end;
+  end;
+end;
+
 procedure TForm1.miSaveNetworkToFileClick(Sender: TObject);
 begin
   //
+end;
+
+procedure TForm1.miSaveRightImageAsBMPClick(Sender: TObject);
+begin
+  if (SavePictureDialogImage2.Execute(Self.Handle)) then
+  begin
+    DXDIBAfterEffect.DIB.SaveToFile(SavePictureDialogImage2.FileName);
+  end;
+end;
+
+procedure TForm1.miSaveRightImageAsJPEGClick(Sender: TObject);
+var
+  jpegimg: TJPEGImage;
+  bmp: TBitmap;
+begin
+  if (SavePictureDialogImage2.Execute(Self.Handle)) then
+  begin
+    jpegimg := TJPEGImage.Create;
+    bmp := TBitmap.Create;
+    try
+      bmp.SetSize(DXDIBAfterEffect.DIB.Width, DXDIBAfterEffect.DIB.Height);
+      bmp.Canvas.Draw(0, 0, DXDIBAfterEffect.DIB);
+      jpegimg.CompressionQuality := 100;
+      jpegimg.Performance := jpeg.jpBestQuality;
+      jpegimg.Assign(bmp);
+      jpegimg.SaveToFile(SavePictureDialogImage2.FileName);
+    finally
+      FreeAndNil(jpegimg);
+      FreeAndNil(bmp);
+    end;
+  end;
 end;
 
 procedure TForm1.miStartNeuroTrainRadius2Click(Sender: TObject);
