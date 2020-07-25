@@ -82,9 +82,9 @@ begin
   for i := 0 to GStartCount - 1 do
     mlprandomize(FNetwork);
     
-  mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
+  //mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
+  mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), 0.01, 1, 0.01, 50, info, rep);
   rep.rmserror := mlprmserror(FNetwork, FMatrix, Length(FMatrix));
-  // mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, 0.001, 300, info, rep);
   SetLength(FMatrix, 0);
   PostMessage(Application.MainForm.Handle, WM_EndOfTrain, NativeUInt(Self), 0);
 end;

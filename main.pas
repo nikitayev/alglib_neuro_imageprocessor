@@ -56,6 +56,7 @@ type
     OpenPictureDialogImage2: TOpenPictureDialog;
     SavePictureDialogImage1: TSavePictureDialog;
     SavePictureDialogImage2: TSavePictureDialog;
+    miGenerateVariant3: TMenuItem;
     procedure JvFilenameEditAfterDialog(Sender: TObject; var AName: string; var AAction: Boolean);
     procedure btGenerateClick(Sender: TObject);
     procedure N1x1Click(Sender: TObject);
@@ -80,6 +81,7 @@ type
     procedure miSaveRightImageAsBMPClick(Sender: TObject);
     procedure miSaveLeftImageAsJPEGClick(Sender: TObject);
     procedure miSaveRightImageAsJPEGClick(Sender: TObject);
+    procedure miGenerateVariant3Click(Sender: TObject);
   private
     procedure GenerateImages(SquareLen, SquareCount: Integer);
     procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
@@ -327,6 +329,13 @@ end;
 procedure TForm1.miGenerateVariant2Click(Sender: TObject);
 begin
   GenerateImages(16, 6);
+
+  ReDrawImages;
+end;
+
+procedure TForm1.miGenerateVariant3Click(Sender: TObject);
+begin
+  GenerateImages(32, 8);
 
   ReDrawImages;
 end;

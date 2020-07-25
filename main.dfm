@@ -140,6 +140,10 @@ object Form1: TForm1
         Caption = #1042#1072#1088#1080#1072#1085#1090' 2 16x6'
         OnClick = miGenerateVariant2Click
       end
+      object miGenerateVariant3: TMenuItem
+        Caption = #1042#1072#1088#1080#1072#1085#1090' 2 32x8'
+        OnClick = miGenerateVariant3Click
+      end
     end
     object N3: TMenuItem
       Caption = #1054#1073#1091#1095#1077#1085#1080#1077
