@@ -3,7 +3,7 @@ unit U_NeuralTrainerThread;
 interface
 
 uses
-  Windows, System.Classes, XALGLIB, U_WMUtils;
+  Windows, SysUtils, System.Classes, XALGLIB, U_WMUtils, SyncObjs;
 
 type
   TNeuralTrainerThread = class(TThread)
@@ -21,9 +21,6 @@ type
     constructor Create(aNetwork: Tmultilayerperceptron; aMatrix: TMatrix;
       const aNetworkFileName, aInfoFileName: string);
   end;
-
-var
-  GStartCount: Integer = -1;
 
 implementation
 
@@ -59,6 +56,17 @@ uses Forms;
   the calling thread in a queue with the other thread.
   
 }
+var
+  GStartCount: Cardinal = 0;
+  GLock: TCriticalSection;
+
+function GetNextStartCount: Cardinal;
+begin
+  GLock.Enter;
+  result := GStartCount;
+  inc(GStartCount);
+  GLock.Leave;
+end;
 
 { TNeuralTrainerThread }
 
@@ -74,12 +82,13 @@ end;
 
 procedure TNeuralTrainerThread.Execute;
 var
-  i: Integer;
+  i: Cardinal;
+  zCount: Cardinal;
 begin
   { Place thread code here }
   // randomize network weights
-  inc(GStartCount);
-  for i := 0 to GStartCount - 1 do
+  zCount := GetNextStartCount;
+  for i := 0 to zCount - 1 do
     mlprandomize(FNetwork);
     
   //mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
@@ -89,4 +98,8 @@ begin
   PostMessage(Application.MainForm.Handle, WM_EndOfTrain, NativeUInt(Self), 0);
 end;
 
+initialization
+  GLock := TCriticalSection.Create;
+finalization
+  FreeAndNil(GLock);
 end.

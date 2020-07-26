@@ -128,6 +128,10 @@ object Form1: TForm1
           Caption = #1056#1072#1076#1080#1091#1089' 4'
           OnClick = N41Click
         end
+        object N51: TMenuItem
+          Caption = #1056#1072#1076#1080#1091#1089' 5'
+          OnClick = N51Click
+        end
       end
     end
     object miProduct: TMenuItem
@@ -160,6 +164,10 @@ object Form1: TForm1
         object miStartNeuroTrainRadius4: TMenuItem
           Caption = #1056#1072#1076#1080#1091#1089' 4'
           OnClick = miStartNeuroTrainRadius4Click
+        end
+        object miStartNeuroTrainRadius5: TMenuItem
+          Caption = #1056#1072#1076#1080#1091#1089' 5'
+          OnClick = miStartNeuroTrainRadius5Click
         end
       end
       object miSaveNetworkToFile: TMenuItem

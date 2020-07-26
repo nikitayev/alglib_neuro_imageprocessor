@@ -57,6 +57,8 @@ type
     SavePictureDialogImage1: TSavePictureDialog;
     SavePictureDialogImage2: TSavePictureDialog;
     miGenerateVariant3: TMenuItem;
+    miStartNeuroTrainRadius5: TMenuItem;
+    N51: TMenuItem;
     procedure JvFilenameEditAfterDialog(Sender: TObject; var AName: string; var AAction: Boolean);
     procedure btGenerateClick(Sender: TObject);
     procedure N1x1Click(Sender: TObject);
@@ -82,6 +84,8 @@ type
     procedure miSaveLeftImageAsJPEGClick(Sender: TObject);
     procedure miSaveRightImageAsJPEGClick(Sender: TObject);
     procedure miGenerateVariant3Click(Sender: TObject);
+    procedure miStartNeuroTrainRadius5Click(Sender: TObject);
+    procedure N51Click(Sender: TObject);
   private
     procedure GenerateImages(SquareLen, SquareCount: Integer);
     procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
@@ -488,6 +492,12 @@ begin
     RunTraining(4, StrToInt(SetNetworkParametersForm.edNHID1.Text), StrToInt(SetNetworkParametersForm.edNHID2.Text));
 end;
 
+procedure TForm1.miStartNeuroTrainRadius5Click(Sender: TObject);
+begin
+  if (SetNetworkParametersForm.ShowModal = mrOk) then
+    RunTraining(5, StrToInt(SetNetworkParametersForm.edNHID1.Text), StrToInt(SetNetworkParametersForm.edNHID2.Text));
+end;
+
 procedure TForm1.N41Click(Sender: TObject);
 begin
   if (Assigned(FNetwork)) then
@@ -503,6 +513,14 @@ begin
   DXDIBAfterEffect.DIB.Blur(24, 1);
   DXDIBAfterEffect.DIB.Blur(24, 1);
   ReDrawImages;
+end;
+
+procedure TForm1.N51Click(Sender: TObject);
+begin
+  if (Assigned(FNetwork)) then
+  begin
+    ApplyNetworkRadiusX(5);
+  end;
 end;
 
 procedure TForm1.ReDrawImages;
