@@ -2,7 +2,8 @@ unit U_VectorList;
 
 interface
 
-uses Classes, XALGLIB;
+uses Classes, Ap, mlpbase;
+  //XALGLIB;
 
 type
 
@@ -23,7 +24,7 @@ type
     property VectorLength:Integer read FVectorLength write SetVectorLength;
   end;
 
-function ConstructMatrixFromVectorList(aVectorList: TVectorList): TMatrix;
+function ConstructMatrixFromVectorList(aVectorList: TVectorList): TReal2DArray;
 
 implementation
 
@@ -40,7 +41,7 @@ begin
     end;
 end;
 
-function ConstructMatrixFromVectorList(aVectorList: TVectorList): TMatrix;
+function ConstructMatrixFromVectorList(aVectorList: TVectorList): TReal2DArray;
 var
   i, j: Integer;
 begin

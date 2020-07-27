@@ -4,17 +4,46 @@
 program Smooth2Sharp;
 
 uses
-  FastMM5,
+  {$IFDEF DEBUG}
+  FastMM4,
+  ErrorManager,
+  ErrorQueue,
+  {$ENDIF }
   Vcl.Forms,
   main in 'main.pas' {Form1},
   U_VectorList in 'U_VectorList.pas',
-  xalglib in 'xalglib.pas',
   U_NeuralTrainerThread in 'U_NeuralTrainerThread.pas',
   U_WMUtils in 'U_WMUtils.pas',
   U_TrainProgressForm in 'U_TrainProgressForm.pas' {TrainProgressForm},
-  U_SetNetworkParametersForm in 'U_SetNetworkParametersForm.pas' {SetNetworkParametersForm};
+  U_SetNetworkParametersForm in 'U_SetNetworkParametersForm.pas' {SetNetworkParametersForm},
+  ap in 'alglib\ap.pas',
+  mlpbase in 'alglib\mlpbase.pas',
+  mlptrain in 'alglib\mlptrain.pas',
+  reflections in 'alglib\reflections.pas',
+  creflections in 'alglib\creflections.pas',
+  hqrnd in 'alglib\hqrnd.pas',
+  matgen in 'alglib\matgen.pas',
+  ablasf in 'alglib\ablasf.pas',
+  ablas in 'alglib\ablas.pas',
+  trfac in 'alglib\trfac.pas',
+  trlinsolve in 'alglib\trlinsolve.pas',
+  safesolve in 'alglib\safesolve.pas',
+  rcond in 'alglib\rcond.pas',
+  matinv in 'alglib\matinv.pas',
+  linmin in 'alglib\linmin.pas',
+  minlbfgs in 'alglib\minlbfgs.pas',
+  hblas in 'alglib\hblas.pas',
+  sblas in 'alglib\sblas.pas',
+  ortfac in 'alglib\ortfac.pas',
+  blas in 'alglib\blas.pas',
+  rotations in 'alglib\rotations.pas',
+  bdsvd in 'alglib\bdsvd.pas',
+  svd in 'alglib\svd.pas',
+  xblas in 'alglib\xblas.pas',
+  densesolver in 'alglib\densesolver.pas';
 
 {$R *.res}
+
 
 begin
   Application.Initialize;
@@ -23,4 +52,5 @@ begin
   Application.CreateForm(TTrainProgressForm, TrainProgressForm);
   Application.CreateForm(TSetNetworkParametersForm, SetNetworkParametersForm);
   Application.Run;
+
 end.

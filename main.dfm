@@ -1,7 +1,9 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 
+    #1059#1090#1080#1083#1080#1090#1072' '#1091#1083#1091#1095#1096#1077#1085#1080#1103' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103' '#1089' '#1080#1089#1087#1086#1083#1100#1079#1086#1074#1072#1085#1080#1077#1084' '#1080#1089#1082#1091#1089#1089#1090#1074#1077#1085#1085#1086#1081' '#1085#1077#1081 +
+    #1088#1086#1089#1077#1090#1080' (nikitayev@mail.ru)'
   ClientHeight = 571
   ClientWidth = 971
   Color = clBtnFace
@@ -145,8 +147,12 @@ object Form1: TForm1
         OnClick = miGenerateVariant2Click
       end
       object miGenerateVariant3: TMenuItem
-        Caption = #1042#1072#1088#1080#1072#1085#1090' 2 32x8'
+        Caption = #1042#1072#1088#1080#1072#1085#1090' 3 32x8'
         OnClick = miGenerateVariant3Click
+      end
+      object miGenerateVariant4: TMenuItem
+        Caption = #1042#1072#1088#1080#1072#1085#1090' 4 48x8'
+        OnClick = miGenerateVariant4Click
       end
     end
     object N3: TMenuItem

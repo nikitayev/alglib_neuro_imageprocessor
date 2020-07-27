@@ -3,23 +3,33 @@ unit U_NeuralTrainerThread;
 interface
 
 uses
-  Windows, SysUtils, System.Classes, XALGLIB, U_WMUtils, SyncObjs;
+  Windows, SysUtils, System.Classes, 
+  //XALGLIB,
+  Ap, mlpbase, mlptrain,
+  U_WMUtils, SyncObjs;
 
 type
   TNeuralTrainerThread = class(TThread)
   private
     { Private declarations }
-    FMatrix: TMatrix;
+    FMatrix: TReal2DArray;
   protected
     procedure Execute; override;
   public
-    rep: Tmlpreport;
-    info: NativeInt;
-    FNetwork: Tmultilayerperceptron;
+    rep: mlpreport;
+    info: Integer;
+    FNetwork: MultiLayerPerceptron;
     FNetworkFileName: string;
     FInfoFileName: string;
-    constructor Create(aNetwork: Tmultilayerperceptron; aMatrix: TMatrix;
-      const aNetworkFileName, aInfoFileName: string);
+    FDoRandomize: boolean;
+    FDecay: double;
+    FRestart: Integer;
+    Fwstep: double;
+    FMaxIts: Integer;
+    FIsTerminated: PBoolean;
+    constructor Create(aNetwork: MultiLayerPerceptron; aMatrix: TReal2DArray;
+      const aNetworkFileName, aInfoFileName: string; aDoRandomize: boolean;
+      aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer);
   end;
 
 implementation
@@ -70,36 +80,46 @@ end;
 
 { TNeuralTrainerThread }
 
-constructor TNeuralTrainerThread.Create(aNetwork: Tmultilayerperceptron; aMatrix: TMatrix;
-  const aNetworkFileName, aInfoFileName: string);
+constructor TNeuralTrainerThread.Create(aNetwork: MultiLayerPerceptron; aMatrix: TReal2DArray;
+  const aNetworkFileName, aInfoFileName: string; aDoRandomize: boolean;
+  aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer);
 begin
   FNetwork := aNetwork;
   FMatrix := aMatrix;
   FNetworkFileName := aNetworkFileName;
   FInfoFileName := aInfoFileName;
+  FDoRandomize := aDoRandomize;
+  FDecay := aDecay;
+  FRestart := aRestart;
+  Fwstep := awstep;
+  FMaxIts := aMaxIts;
+  new(FIsTerminated);
   inherited Create;
 end;
 
 procedure TNeuralTrainerThread.Execute;
-var
-  i: Cardinal;
-  zCount: Cardinal;
 begin
   { Place thread code here }
-  // randomize network weights
-  zCount := GetNextStartCount;
-  for i := 0 to zCount - 1 do
+  if (FDoRandomize) then
+  begin
+    // randomize network weights
     mlprandomize(FNetwork);
-    
-  //mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
-  mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), 0.01, 1, 0.01, 50, info, rep);
-  rep.rmserror := mlprmserror(FNetwork, FMatrix, Length(FMatrix));
+  end;
+
+  // mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
+  mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), FDecay, FRestart, Fwstep, FMaxIts, info, rep, FIsTerminated, rep.rmserror);
+  //rep.rmserror := mlprmserror(FNetwork, FMatrix, Length(FMatrix));
   SetLength(FMatrix, 0);
   PostMessage(Application.MainForm.Handle, WM_EndOfTrain, NativeUInt(Self), 0);
+  dispose(FIsTerminated);
 end;
 
 initialization
-  GLock := TCriticalSection.Create;
+
+GLock := TCriticalSection.Create;
+
 finalization
-  FreeAndNil(GLock);
+
+FreeAndNil(GLock);
+
 end.

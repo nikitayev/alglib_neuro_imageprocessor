@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls, 
-  XALGLIB;
+  Ap, mlpbase, mlptrain;
 
 type
   TTrainMode = (tmNone, tmRun);
@@ -22,7 +22,7 @@ type
   public
     { Public declarations }
     FTrainMode: TTrainMode;
-    procedure AddResults(aRep: Tmlpreport; info: NativeInt);
+    procedure AddResults(aRep: mlpreport; info: NativeInt);
     procedure StartNewTask;
   end;
 
@@ -35,22 +35,18 @@ implementation
 
 { TForm2 }
 
-procedure TTrainProgressForm.AddResults(aRep: Tmlpreport; info: NativeInt);
+procedure TTrainProgressForm.AddResults(aRep: mlpreport; info: NativeInt);
 begin
   with sgTrainProgressGrid do
   begin
     RowCount := RowCount + 1;
     Cells[0, FCurrentRow] := IntToStr(FCurrentRow);
-    Cells[1, FCurrentRow] := FloatToStrF(aRep.relclserror, ffGeneral, 4, 2);
-    Cells[2, FCurrentRow] := FloatToStrF(aRep.avgce, ffGeneral, 4, 2);
-    Cells[3, FCurrentRow] := FloatToStrF(aRep.rmserror, ffGeneral, 4, 2);
-    Cells[4, FCurrentRow] := FloatToStrF(aRep.avgerror, ffGeneral, 4, 2);
-    Cells[5, FCurrentRow] := FloatToStrF(aRep.avgrelerror, ffGeneral, 4, 2);
+    Cells[1, FCurrentRow] := FloatToStrF(aRep.rmserror, ffGeneral, 6, 2);
 
-    Cells[6, FCurrentRow] := IntToStr(aRep.ngrad);
-    Cells[7, FCurrentRow] := IntToStr(aRep.nhess);
-    Cells[8, FCurrentRow] := IntToStr(aRep.ncholesky);
-    Cells[9, FCurrentRow] := IntToStr(info);
+    Cells[2, FCurrentRow] := IntToStr(aRep.ngrad);
+    Cells[3, FCurrentRow] := IntToStr(aRep.nhess);
+    Cells[4, FCurrentRow] := IntToStr(aRep.ncholesky);
+    Cells[5, FCurrentRow] := IntToStr(info);
   end;
   Inc(FCurrentRow);
 end;
@@ -71,18 +67,14 @@ begin
       for j := 0 to RowCount - 1 do
         Cells[i, j] := '';
 
-    ColCount := 10;
+    ColCount := 6;
     RowCount := 2;
     Cells[0, 0] := '¹';
-    Cells[1, 0] := 'relclserror';
-    Cells[2, 0] := 'avgce';
-    Cells[3, 0] := 'rmserror';
-    Cells[4, 0] := 'avgerror';
-    Cells[5, 0] := 'avgrelerror';
-    Cells[6, 0] := 'ngrad';
-    Cells[7, 0] := 'nhess';
-    Cells[8, 0] := 'ncholesky';
-    Cells[9, 0] := 'info';
+    Cells[1, 0] := 'rmserror';
+    Cells[2, 0] := 'ngrad';
+    Cells[3, 0] := 'nhess';
+    Cells[4, 0] := 'ncholesky';
+    Cells[5, 0] := 'info';
   end;
 end;
 

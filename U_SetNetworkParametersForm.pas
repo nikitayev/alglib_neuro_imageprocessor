@@ -14,6 +14,14 @@ type
     edNHID2: TEdit;
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    Label3: TLabel;
+    edDecay: TEdit;
+    Label4: TLabel;
+    edRestarts: TEdit;
+    Label5: TLabel;
+    edWStep: TEdit;
+    Label6: TLabel;
+    edIts: TEdit;
   private
     { Private declarations }
   public
