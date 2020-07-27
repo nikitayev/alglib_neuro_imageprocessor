@@ -1,0 +1,3 @@
+time: 27.07.2020 15:35:52, info: 2, rmserror: 7,40888194031756E+001, ngrad: 0, nhess: 0, ncholesky: 0
+time: 27.07.2020 15:44:07, info: 2, rmserror: 1,94804253298112E+001, ngrad: 573, nhess: 0, ncholesky: 0
+time: 27.07.2020 15:52:54, info: 2, rmserror: 1,93877178718465E+001, ngrad: 584, nhess: 0, ncholesky: 0
