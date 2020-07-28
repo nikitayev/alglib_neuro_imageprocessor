@@ -120,7 +120,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 4
-    Text = '0.01'
+    Text = '0.001'
   end
   object edRestarts: TEdit
     Left = 256
@@ -147,7 +147,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 7
-    Text = '30'
+    Text = '100'
   end
   object edNHID3: TEdit
     Left = 256
