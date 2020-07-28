@@ -6,8 +6,6 @@ program Smooth2Sharp;
 uses
   {$IFDEF DEBUG}
   FastMM4,
-  ErrorManager,
-  ErrorQueue,
   {$ENDIF }
   Vcl.Forms,
   main in 'main.pas' {Form1},
@@ -40,7 +38,9 @@ uses
   bdsvd in 'alglib\bdsvd.pas',
   svd in 'alglib\svd.pas',
   xblas in 'alglib\xblas.pas',
-  densesolver in 'alglib\densesolver.pas';
+  densesolver in 'alglib\densesolver.pas',
+  U_ImageModificatorThread in 'U_ImageModificatorThread.pas',
+  U_BufferImage in 'U_BufferImage.pas';
 
 {$R *.res}
 

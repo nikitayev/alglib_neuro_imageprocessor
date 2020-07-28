@@ -8,7 +8,7 @@ uses
   DIB, Ap, mlpbase, mlptrain,
   UITypes, Vcl.Menus, U_VectorList, IOUtils, math, U_TrainProgressForm,
   U_WMUtils, U_NeuralTrainerThread, JclSysInfo, U_SetNetworkParametersForm, Vcl.ExtDlgs,
-  Clipbrd, jpeg, StrUtils;
+  Clipbrd, jpeg, StrUtils, U_BufferImage, U_ImageModificatorThread;
 
 type
 
@@ -64,10 +64,13 @@ type
     procedure JvFilenameEditAfterDialog(Sender: TObject; var AName: string; var AAction: Boolean);
     procedure btGenerateClick(Sender: TObject);
     procedure N1x1Click(Sender: TObject);
-    procedure miGenerateVariant1Click(Sender: TObject);
     procedure N2x1Click(Sender: TObject);
     procedure N3x1Click(Sender: TObject);
     procedure N4x1Click(Sender: TObject);
+    procedure miGenerateVariant1Click(Sender: TObject);
+    procedure miGenerateVariant2Click(Sender: TObject);
+    procedure miGenerateVariant3Click(Sender: TObject);
+    procedure miGenerateVariant4Click(Sender: TObject);
     procedure miSaveNetworkToFileClick(Sender: TObject);
     procedure miLoadNetworkClick(Sender: TObject);
     procedure miApplyNetworkClick(Sender: TObject);
@@ -75,9 +78,9 @@ type
     procedure miStartNeuroTrainRadius3Click(Sender: TObject);
     procedure miStartNeuroTrainRadius4Click(Sender: TObject);
     procedure miStartNeuroTrainRadius5Click(Sender: TObject);
-    procedure miGenerateVariant2Click(Sender: TObject);
     procedure N31Click(Sender: TObject);
     procedure N41Click(Sender: TObject);
+    procedure N51Click(Sender: TObject);
     procedure miLoadFromFileLeftClick(Sender: TObject);
     procedure miLoadFromFileRightClick(Sender: TObject);
     procedure miCopyLeftImageClick(Sender: TObject);
@@ -86,15 +89,14 @@ type
     procedure miSaveRightImageAsBMPClick(Sender: TObject);
     procedure miSaveLeftImageAsJPEGClick(Sender: TObject);
     procedure miSaveRightImageAsJPEGClick(Sender: TObject);
-    procedure miGenerateVariant3Click(Sender: TObject);
-    procedure N51Click(Sender: TObject);
-    procedure miGenerateVariant4Click(Sender: TObject);
   private
     procedure GenerateImages(SquareLen, SquareCount: Integer);
     procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
+    procedure UpdateImage(var msg: TMessage); message WM_EndOfImagePaint;
     procedure RunTraining(aRadius: byte; nhid1, nhid2: Cardinal; aDoRandomize: Boolean;
       aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer);
     procedure ApplyNetworkRadiusX(aRadius: word);
+    procedure ApplyNetworkRadiusXThrd(aRadius: word);
     procedure FillNetworkParameters;
     { Private declarations }
   public
@@ -114,6 +116,9 @@ type
     FRestart: Integer;
     Fwstep: double;
     FMaxIts: Integer;
+    FImageSrc: PBufferImage;
+    FImageDst: PBufferImage;
+
     procedure ReDrawImages;
   end;
 
@@ -227,6 +232,30 @@ begin
   mlpcreateb2(Length(aMatrix[0]) - 1, nhid1, nhid2, 1, 0, 0, result);
 end;
 
+procedure TForm1.ApplyNetworkRadiusXThrd(aRadius: word);
+var
+  i: Integer;
+  zRect: TRect;
+  zHeight: Integer;
+  zNetwork: MultiLayerPerceptron;
+begin
+  //
+  FreeImageCopy(FImageSrc);
+  FreeImageCopy(FImageDst);
+  FImageSrc := CreateImageCopy(DXDIBSrc.DIB);
+  FImageDst := CreateImageCopy(DXDIBAfterEffect.DIB);
+  zHeight := DXDIBSrc.DIB.Height - 2 * aRadius;
+  for i := 0 to ProcessorCount - 1 do
+  begin
+    zRect.Left := aRadius;
+    zRect.Right := DXDIBSrc.DIB.Width - aRadius - 1;
+    zRect.Top := aRadius + i * round(zHeight / ProcessorCount);
+    zRect.Bottom := aRadius + round((i + 1) * (zHeight / ProcessorCount));
+    MLPCopy(FNetwork, zNetwork);
+    TImageModificatorThread.Create(FImageSrc, FImageDst, zRect, aRadius, zNetwork);
+  end;
+end;
+
 procedure TForm1.btGenerateClick(Sender: TObject);
 begin
 
@@ -238,7 +267,7 @@ begin
   if (FileExists(AName)) then
   begin
     DXDIBSrc.DIB.LoadFromFile(AName);
-    DXDIBAfterEffect.DIB.Assign(DXDIBSrc.DIB);
+    DXDIBAfterEffect.DIB.LoadFromFile(AName);
     ReDrawImages;
   end;
 end;
@@ -318,7 +347,7 @@ procedure TForm1.miApplyNetworkClick(Sender: TObject);
 begin
   if (Length(FNetwork.Weights) > 0) then
   begin
-    ApplyNetworkRadiusX(2);
+    ApplyNetworkRadiusXThrd(2);
   end;
 end;
 
@@ -505,7 +534,7 @@ procedure TForm1.N31Click(Sender: TObject);
 begin
   if (Length(FNetwork.Weights) > 0) then
   begin
-    ApplyNetworkRadiusX(3);
+    ApplyNetworkRadiusXThrd(3);
   end;
 end;
 
@@ -541,7 +570,7 @@ procedure TForm1.N41Click(Sender: TObject);
 begin
   if (Length(FNetwork.Weights) > 0) then
   begin
-    ApplyNetworkRadiusX(4);
+    ApplyNetworkRadiusXThrd(4);
   end;
 end;
 
@@ -558,7 +587,7 @@ procedure TForm1.N51Click(Sender: TObject);
 begin
   if (Length(FNetwork.Weights) > 0) then
   begin
-    ApplyNetworkRadiusX(5);
+    ApplyNetworkRadiusXThrd(5);
   end;
 end;
 
@@ -694,6 +723,12 @@ begin
   else
     MessageDlg('Предыдущий процесс обучения ещё не завершён', mtInformation, [mbOk], 0, mbOk);
 
+end;
+
+procedure TForm1.UpdateImage(var msg: TMessage);
+begin
+  DrawCopy2Image(FImageDst^, DXDIBAfterEffect.DIB);
+  ReDrawImages;
 end;
 
 procedure TForm1.GenerateImages(SquareLen, SquareCount: Integer);
