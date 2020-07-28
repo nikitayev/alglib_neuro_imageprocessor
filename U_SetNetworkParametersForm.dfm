@@ -55,9 +55,9 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   object Label5: TLabel
     Left = 24
     Top = 140
-    Width = 72
+    Width = 50
     Height = 13
-    Caption = #1096#1072#1075' (0.001..1)'
+    Caption = #1096#1072#1075' (0..1)'
   end
   object Label6: TLabel
     Left = 24
@@ -138,7 +138,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 6
-    Text = '0.01'
+    Text = '0.001'
   end
   object edIts: TEdit
     Left = 256
