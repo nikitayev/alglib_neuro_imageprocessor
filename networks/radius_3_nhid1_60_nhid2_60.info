@@ -1,0 +1,15 @@
+time: 28.07.2020 12:48:59, info: 2, rmserror: 1,34561984847571E+002, ngrad: 0, nhess: 0, ncholesky: 0
+time: 28.07.2020 12:48:59, info: 2, rmserror: 9,78218974216319E+001, ngrad: 0, nhess: 0, ncholesky: 0
+time: 28.07.2020 12:56:12, info: 2, rmserror: 2,37749673236336E+001, ngrad: 55, nhess: 0, ncholesky: 0
+time: 28.07.2020 12:56:32, info: 2, rmserror: 2,34854394021523E+001, ngrad: 58, nhess: 0, ncholesky: 0
+time: 28.07.2020 12:56:40, info: 2, rmserror: 2,28299554785421E+001, ngrad: 59, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:03:31, info: 2, rmserror: 1,94124727089794E+001, ngrad: 56, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:10:49, info: 2, rmserror: 1,78786278884741E+001, ngrad: 56, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:18:15, info: 2, rmserror: 1,71003855065077E+001, ngrad: 57, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:26:03, info: 2, rmserror: 1,64704111707117E+001, ngrad: 60, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:33:44, info: 2, rmserror: 1,60949362216255E+001, ngrad: 59, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:41:33, info: 2, rmserror: 1,58577292927473E+001, ngrad: 58, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:49:23, info: 2, rmserror: 1,56602264561410E+001, ngrad: 59, nhess: 0, ncholesky: 0
+time: 28.07.2020 13:56:55, info: 2, rmserror: 1,55272388521544E+001, ngrad: 57, nhess: 0, ncholesky: 0
+time: 28.07.2020 14:04:54, info: 2, rmserror: 1,54010421309140E+001, ngrad: 60, nhess: 0, ncholesky: 0
+time: 28.07.2020 14:12:19, info: 2, rmserror: 1,52996985537797E+001, ngrad: 57, nhess: 0, ncholesky: 0
