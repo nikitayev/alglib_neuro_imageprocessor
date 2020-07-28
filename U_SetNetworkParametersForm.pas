@@ -22,6 +22,8 @@ type
     edWStep: TEdit;
     Label6: TLabel;
     edIts: TEdit;
+    Label7: TLabel;
+    edNHID3: TEdit;
   private
     { Private declarations }
   public

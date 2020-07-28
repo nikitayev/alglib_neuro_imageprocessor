@@ -50,6 +50,8 @@ procedure MLPCreateB1(NIn: AlglibInteger; NHid: AlglibInteger; NOut: AlglibInteg
   var Network: MultiLayerPerceptron);
 procedure MLPCreateB2(NIn: AlglibInteger; NHid1: AlglibInteger; NHid2: AlglibInteger; NOut: AlglibInteger;
   B: AlglibFloat; D: AlglibFloat; var Network: MultiLayerPerceptron);
+procedure MLPCreateB3(NIn: AlglibInteger; NHid1, NHid2, NHid3: AlglibInteger; NOut: AlglibInteger;
+  B: AlglibFloat; D: AlglibFloat; var Network: MultiLayerPerceptron);
 procedure MLPCreateR0(NIn: AlglibInteger; NOut: AlglibInteger; A: AlglibFloat; B: AlglibFloat;
   var Network: MultiLayerPerceptron);
 procedure MLPCreateR1(NIn: AlglibInteger; NHid: AlglibInteger; NOut: AlglibInteger; A: AlglibFloat; B: AlglibFloat;
@@ -424,6 +426,65 @@ begin
   AddBiasedSummatorLayer(NHid1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
   AddActivationLayer(1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
   AddBiasedSummatorLayer(NHid2, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddActivationLayer(1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddBiasedSummatorLayer(NOut, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddActivationLayer(3, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+
+  //
+  // Create
+  //
+  MLPCreate(NIn, NOut, LSizes, LTypes, LConnFirst, LConnLast, LayersCount, False, Network);
+
+  //
+  // Turn on ouputs shift/scaling.
+  //
+  I := NIn;
+  while I <= NIn + NOut - 1 do
+  begin
+    Network.ColumnMeans[I] := B;
+    Network.ColumnSigmas[I] := D;
+    Inc(I);
+  end;
+end;
+
+procedure MLPCreateB3(NIn: AlglibInteger; NHid1, NHid2, NHid3: AlglibInteger; NOut: AlglibInteger;
+  B: AlglibFloat; D: AlglibFloat; var Network: MultiLayerPerceptron);
+var
+  LSizes: TInteger1DArray;
+  LTypes: TInteger1DArray;
+  LConnFirst: TInteger1DArray;
+  LConnLast: TInteger1DArray;
+  LayersCount: AlglibInteger;
+  LastProc: AlglibInteger;
+  I: AlglibInteger;
+begin
+  LayersCount := 1 + 3 + 3 + 3 + 3;
+  if AP_FP_Greater_Eq(D, 0) then
+  begin
+    D := 1;
+  end
+  else
+  begin
+    D := -1;
+  end;
+
+  //
+  // Allocate arrays
+  //
+  SetLength(LSizes, LayersCount - 1 + 1);
+  SetLength(LTypes, LayersCount - 1 + 1);
+  SetLength(LConnFirst, LayersCount - 1 + 1);
+  SetLength(LConnLast, LayersCount - 1 + 1);
+
+  //
+  // Layers
+  //
+  AddInputLayer(NIn, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddBiasedSummatorLayer(NHid1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddActivationLayer(1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddBiasedSummatorLayer(NHid2, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddActivationLayer(1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
+  AddBiasedSummatorLayer(NHid3, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
   AddActivationLayer(1, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
   AddBiasedSummatorLayer(NOut, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
   AddActivationLayer(3, LSizes, LTypes, LConnFirst, LConnLast, LastProc);
