@@ -288,8 +288,8 @@ begin
       // попробуем уточнить
       MLPCopy(zThread.FNetwork, zNetworkCopy);
       TNeuralTrainerThread.Create(zNetworkCopy, DynamicArrayCopy(FMatrix),
-        FFileName + '.network', FFileName + '.info', false, zThread.FDecay * 0.1, FRestart,
-        zThread.Fwstep * 0.1, FMaxIts);
+        FFileName + '.network', FFileName + '.info', false, zThread.FDecay * 0.3, FRestart,
+        zThread.Fwstep * 0.3, FMaxIts);
       zNewThreadStarted := true;
     end;
   end
