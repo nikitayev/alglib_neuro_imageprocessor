@@ -1,8 +1,8 @@
 object SetNetworkParametersForm: TSetNetworkParametersForm
   Left = 0
   Top = 0
-  Width = 409
-  Height = 272
+  Width = 450
+  Height = 384
   AutoScroll = True
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1072' '#1087#1072#1088#1072#1084#1077#1090#1088#1086#1074' '#1086#1073#1091#1095#1077#1085#1080#1103
   Color = clBtnFace
@@ -20,8 +20,8 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   OldCreateOrder = False
   Position = poMainFormCenter
   DesignSize = (
-    393
-    233)
+    434
+    345)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -92,26 +92,28 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Text = '30'
   end
   object BitBtn1: TBitBtn
-    Left = 310
-    Top = 200
+    Left = 351
+    Top = 312
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkCancel
     NumGlyphs = 2
     TabOrder = 2
-    ExplicitTop = 174
+    ExplicitLeft = 310
+    ExplicitTop = 200
   end
   object BitBtn2: TBitBtn
-    Left = 214
-    Top = 200
+    Left = 255
+    Top = 312
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkOK
     NumGlyphs = 2
     TabOrder = 3
-    ExplicitTop = 174
+    ExplicitLeft = 214
+    ExplicitTop = 200
   end
   object edDecay: TEdit
     Left = 256
@@ -120,7 +122,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 4
-    Text = '0.001'
+    Text = '0.01'
   end
   object edRestarts: TEdit
     Left = 256
@@ -138,7 +140,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 6
-    Text = '0.001'
+    Text = '0'
   end
   object edIts: TEdit
     Left = 256
@@ -147,7 +149,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 7
-    Text = '100'
+    Text = '30'
   end
   object edNHID3: TEdit
     Left = 256
@@ -157,5 +159,27 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     NumbersOnly = True
     TabOrder = 8
     Text = '30'
+  end
+  object btSettingsSoft: TButton
+    Left = 16
+    Top = 300
+    Width = 121
+    Height = 17
+    Anchors = [akLeft, akBottom]
+    Caption = #1084#1103#1075#1082#1080#1077
+    TabOrder = 9
+    OnClick = btSettingsSoftClick
+    ExplicitTop = 312
+  end
+  object btSettingsPrecission: TButton
+    Left = 16
+    Top = 320
+    Width = 121
+    Height = 17
+    Anchors = [akLeft, akBottom]
+    Caption = #1090#1086#1095#1085#1099#1077
+    TabOrder = 10
+    OnClick = btSettingsPrecissionClick
+    ExplicitTop = 332
   end
 end

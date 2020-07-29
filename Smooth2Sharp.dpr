@@ -40,7 +40,8 @@ uses
   xblas in 'alglib\xblas.pas',
   densesolver in 'alglib\densesolver.pas',
   U_ImageModificatorThread in 'U_ImageModificatorThread.pas',
-  U_BufferImage in 'U_BufferImage.pas';
+  U_BufferImage in 'U_BufferImage.pas',
+  U_Utils in 'U_Utils.pas';
 
 {$R *.res}
 

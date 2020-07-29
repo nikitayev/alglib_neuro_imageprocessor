@@ -8,7 +8,7 @@ uses
   DIB, Ap, mlpbase, mlptrain,
   UITypes, Vcl.Menus, U_VectorList, IOUtils, math, U_TrainProgressForm,
   U_WMUtils, U_NeuralTrainerThread, JclSysInfo, U_SetNetworkParametersForm, Vcl.ExtDlgs,
-  Clipbrd, jpeg, StrUtils, U_BufferImage, U_ImageModificatorThread;
+  Clipbrd, jpeg, StrUtils, U_BufferImage, U_ImageModificatorThread, U_Utils;
 
 type
 
@@ -61,6 +61,7 @@ type
     miStartNeuroTrainRadius5: TMenuItem;
     N51: TMenuItem;
     miGenerateVariant4: TMenuItem;
+    miStartRefinement: TMenuItem;
     procedure JvFilenameEditAfterDialog(Sender: TObject; var AName: string; var AAction: Boolean);
     procedure btGenerateClick(Sender: TObject);
     procedure N1x1Click(Sender: TObject);
@@ -89,12 +90,14 @@ type
     procedure miSaveRightImageAsBMPClick(Sender: TObject);
     procedure miSaveLeftImageAsJPEGClick(Sender: TObject);
     procedure miSaveRightImageAsJPEGClick(Sender: TObject);
+    procedure miStartRefinementClick(Sender: TObject);
   private
     procedure GenerateImages(SquareLen, SquareCount: Integer);
     procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
     procedure UpdateImage(var msg: TMessage); message WM_EndOfImagePaint;
-    procedure RunTraining(aRadius: byte; nhid1, nhid2, nhid3: Cardinal; aDoRandomize: Boolean;
-      aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer);
+    function RunTraining(aRadius: byte; nhid1, nhid2, nhid3: Cardinal; aDoRandomize: Boolean;
+      aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer): Boolean;
+    function RunRefinement(aDecay: double; awstep: double; aMaxIts: Integer): Boolean;
     procedure ApplyNetworkRadiusX(aRadius: word);
     procedure ApplyNetworkRadiusXThrd(aRadius: word);
     procedure FillNetworkParameters;
@@ -313,15 +316,17 @@ begin
       Frep.ngrad, Frep.nhess, Frep.ncholesky]), TEncoding.UTF8);
     mlpserialize(FNetwork, zThread.FNetworkFileName);
 
-    if (TrainProgressForm.FTrainMode = tmRun) then
-    begin
+    { уточнение реализовано отдельно
+      if (TrainProgressForm.FTrainMode = tmRun) then
+      begin
       // попробуем уточнить
       MLPCopy(zThread.FNetwork, zNetworkCopy);
       TNeuralTrainerThread.Create(zNetworkCopy, DynamicArrayCopy(FMatrix),
-        FFileName + '.network', FFileName + '.info', false, zThread.FDecay * 0.3, FRestart,
-        zThread.Fwstep * 0.3, FMaxIts);
+      FFileName + '.network', FFileName + '.info', false, zThread.FDecay * 0.3, FRestart,
+      zThread.Fwstep * 0.3, FMaxIts);
       zNewThreadStarted := true;
-    end;
+      end;
+    }
   end
   else
   begin
@@ -567,6 +572,21 @@ begin
   end;
 end;
 
+procedure TForm1.miStartRefinementClick(Sender: TObject);
+var
+  zNetworkCopy: MultiLayerPerceptron;
+begin
+  SetNetworkParametersForm.btSettingsPrecissionClick(nil);
+  if (SetNetworkParametersForm.ShowModal = mrOk) then
+  begin
+    FillNetworkParameters;
+
+    RunRefinement(FDecay, Fwstep, FMaxIts);
+    // сразу отключаем обучение
+    TrainProgressForm.FTrainMode := tmNone;
+  end;
+end;
+
 procedure TForm1.N41Click(Sender: TObject);
 begin
   if (Length(FNetwork.Weights) > 0) then
@@ -625,12 +645,6 @@ begin
 end;
 
 procedure TForm1.FillNetworkParameters;
-  function StrAsValue(const aStr: string): string;
-  begin
-    result := ReplaceStr(aStr, '.', FormatSettings.DecimalSeparator);
-    result := ReplaceStr(result, ',', FormatSettings.DecimalSeparator);
-  end;
-
 begin
   Fnhid1 := StrToInt(SetNetworkParametersForm.edNHID1.Text);
   Fnhid2 := StrToInt(SetNetworkParametersForm.edNHID2.Text);
@@ -693,12 +707,41 @@ begin
   Screen.Cursor := crDefault;
 end;
 
-procedure TForm1.RunTraining(aRadius: byte; nhid1, nhid2, nhid3: Cardinal; aDoRandomize: Boolean;
-  aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer);
+function TForm1.RunRefinement(aDecay: double; awstep: double; aMaxIts: Integer): Boolean;
 var
   i: Integer;
   zNetworkCopy: MultiLayerPerceptron;
 begin
+  result := false;
+  // пока есть незавершённые потоки - не начинаем новый процесс
+  // уточнение производится в рамках одной сессии обучения.
+  // нельзя загрузить нейросеть из файла и дообучить
+  if (FRunnedThreads = FDoneThreadCount) then
+  begin
+    if ((Length(FNetwork.Weights) = 0) or (FFileName = '')) then
+      exit;
+    TrainProgressForm.FTrainMode := tmRun;
+    Screen.Cursor := crHourGlass;
+    MLPCopy(FNetwork, zNetworkCopy);
+    TNeuralTrainerThread.Create(zNetworkCopy, DynamicArrayCopy(FMatrix),
+      FFileName + '.network', FFileName + '.info', false, aDecay, 1, awstep, aMaxIts);
+    TrainProgressForm.StartNewTask;
+    TrainProgressForm.Show;
+    Screen.Cursor := crDefault;
+    result := true;
+  end
+  else
+    MessageDlg('Предыдущий процесс обучения ещё не завершён', mtInformation, [mbOk], 0, mbOk);
+
+end;
+
+function TForm1.RunTraining(aRadius: byte; nhid1, nhid2, nhid3: Cardinal; aDoRandomize: Boolean;
+  aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer): Boolean;
+var
+  i: Integer;
+  zNetworkCopy: MultiLayerPerceptron;
+begin
+  result := false;
   // пока есть незавершённые потоки - не начинаем новый процесс
   if (FRunnedThreads = FDoneThreadCount) then
   begin
@@ -721,10 +764,10 @@ begin
     TrainProgressForm.StartNewTask;
     TrainProgressForm.Show;
     Screen.Cursor := crDefault;
+    result := true;
   end
   else
     MessageDlg('Предыдущий процесс обучения ещё не завершён', mtInformation, [mbOk], 0, mbOk);
-
 end;
 
 procedure TForm1.UpdateImage(var msg: TMessage);

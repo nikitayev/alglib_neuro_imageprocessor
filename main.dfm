@@ -176,6 +176,10 @@ object Form1: TForm1
           OnClick = miStartNeuroTrainRadius5Click
         end
       end
+      object miStartRefinement: TMenuItem
+        Caption = #1057#1090#1072#1088#1090' '#1091#1090#1086#1095#1085#1077#1085#1080#1103
+        OnClick = miStartRefinementClick
+      end
       object miSaveNetworkToFile: TMenuItem
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1088#1077#1079#1091#1083#1100#1090#1072#1090' '#1074' '#1092#1072#1081#1083'...'
         OnClick = miSaveNetworkToFileClick

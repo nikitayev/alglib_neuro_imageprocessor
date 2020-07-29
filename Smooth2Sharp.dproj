@@ -189,6 +189,7 @@
         <DCCReference Include="alglib\densesolver.pas"/>
         <DCCReference Include="U_ImageModificatorThread.pas"/>
         <DCCReference Include="U_BufferImage.pas"/>
+        <DCCReference Include="U_Utils.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
