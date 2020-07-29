@@ -26,6 +26,10 @@ type
     Label7: TLabel;
     btSettingsSoft: TButton;
     btSettingsPrecission: TButton;
+    Label8: TLabel;
+    edNHIDnext: TEdit;
+    Label9: TLabel;
+    edNHIDLayersCount: TEdit;
     procedure btSettingsSoftClick(Sender: TObject);
     procedure btSettingsPrecissionClick(Sender: TObject);
   private

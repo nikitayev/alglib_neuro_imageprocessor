@@ -2,11 +2,11 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   Left = 0
   Top = 0
   Width = 450
-  Height = 384
+  Height = 321
   AutoScroll = True
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1072' '#1087#1072#1088#1072#1084#1077#1090#1088#1086#1074' '#1086#1073#1091#1095#1077#1085#1080#1103
   Color = clBtnFace
-  Constraints.MinHeight = 272
+  Constraints.MinHeight = 321
   Constraints.MinWidth = 408
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   Position = poMainFormCenter
   DesignSize = (
     434
-    345)
+    282)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -40,28 +40,28 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object Label3: TLabel
     Left = 24
-    Top = 87
+    Top = 142
     Width = 107
     Height = 13
     Caption = #1047#1072#1090#1091#1093#1072#1085#1080#1077' (0.001..1)'
   end
   object Label4: TLabel
     Left = 24
-    Top = 114
+    Top = 169
     Width = 78
     Height = 13
     Caption = #1056#1077#1089#1090#1072#1088#1090#1086#1074' (>0)'
   end
   object Label5: TLabel
     Left = 24
-    Top = 140
+    Top = 195
     Width = 50
     Height = 13
     Caption = #1096#1072#1075' (0..1)'
   end
   object Label6: TLabel
     Left = 24
-    Top = 167
+    Top = 222
     Width = 181
     Height = 13
     Caption = #1052#1072#1082#1089#1080#1084#1072#1083#1100#1085#1086#1077' '#1095#1080#1089#1083#1086' '#1080#1090#1077#1088#1072#1094#1080#1081' (>0)'
@@ -72,6 +72,20 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Width = 212
     Height = 13
     Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1085#1077#1081#1088#1086#1085#1086#1074' 3-'#1075#1086' '#1089#1082#1088#1099#1090#1086#1075#1086' '#1089#1083#1086#1103
+  end
+  object Label8: TLabel
+    Left = 23
+    Top = 88
+    Width = 208
+    Height = 13
+    Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1085#1077#1081#1088#1086#1085#1086#1074' 4+ '#1089#1082#1088#1099#1090#1099#1093' '#1089#1083#1086#1105#1074
+  end
+  object Label9: TLabel
+    Left = 23
+    Top = 115
+    Width = 165
+    Height = 13
+    Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1089#1082#1088#1099#1090#1099#1093' '#1089#1083#1086#1105#1074' (>2)'
   end
   object edNHID1: TEdit
     Left = 256
@@ -93,7 +107,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object BitBtn1: TBitBtn
     Left = 351
-    Top = 312
+    Top = 249
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -105,7 +119,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object BitBtn2: TBitBtn
     Left = 255
-    Top = 312
+    Top = 249
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -117,7 +131,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object edDecay: TEdit
     Left = 256
-    Top = 87
+    Top = 142
     Width = 121
     Height = 21
     NumbersOnly = True
@@ -126,7 +140,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object edRestarts: TEdit
     Left = 256
-    Top = 114
+    Top = 169
     Width = 121
     Height = 21
     NumbersOnly = True
@@ -135,7 +149,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object edWStep: TEdit
     Left = 256
-    Top = 140
+    Top = 195
     Width = 121
     Height = 21
     NumbersOnly = True
@@ -144,7 +158,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object edIts: TEdit
     Left = 256
-    Top = 167
+    Top = 222
     Width = 121
     Height = 21
     NumbersOnly = True
@@ -162,7 +176,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object btSettingsSoft: TButton
     Left = 16
-    Top = 300
+    Top = 237
     Width = 121
     Height = 17
     Anchors = [akLeft, akBottom]
@@ -173,7 +187,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
   end
   object btSettingsPrecission: TButton
     Left = 16
-    Top = 320
+    Top = 257
     Width = 121
     Height = 17
     Anchors = [akLeft, akBottom]
@@ -181,5 +195,23 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     TabOrder = 10
     OnClick = btSettingsPrecissionClick
     ExplicitTop = 332
+  end
+  object edNHIDnext: TEdit
+    Left = 255
+    Top = 88
+    Width = 121
+    Height = 21
+    NumbersOnly = True
+    TabOrder = 11
+    Text = '10'
+  end
+  object edNHIDLayersCount: TEdit
+    Left = 255
+    Top = 115
+    Width = 121
+    Height = 21
+    NumbersOnly = True
+    TabOrder = 12
+    Text = '4'
   end
 end

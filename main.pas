@@ -95,7 +95,7 @@ type
     procedure GenerateImages(SquareLen, SquareCount: Integer);
     procedure MessageReceiver(var msg: TMessage); message WM_EndOfTrain;
     procedure UpdateImage(var msg: TMessage); message WM_EndOfImagePaint;
-    function RunTraining(aRadius: byte; nhid1, nhid2, nhid3: Cardinal; aDoRandomize: Boolean;
+    function RunTraining(aRadius: byte; nhid1, nhid2, nhid3, NHidnext, NHidLayersCount: Cardinal; aDoRandomize: Boolean;
       aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer): Boolean;
     function RunRefinement(aDecay: double; awstep: double; aMaxIts: Integer): Boolean;
     procedure ApplyNetworkRadiusX(aRadius: word);
@@ -115,6 +115,8 @@ type
     Fnhid1: Cardinal;
     Fnhid2: Cardinal;
     Fnhid3: Cardinal;
+    FNHidnext: Cardinal;
+    FNHidLayersCount: Cardinal;
     FFileName: string;
     FDecay: double;
     FRestart: Integer;
@@ -231,9 +233,11 @@ begin
   FreeAndNil(zVectorList);
 end;
 
-function GetNetwork(aMatrix: TReal2DArray; nhid1, nhid2, nhid3: Cardinal): MultiLayerPerceptron;
+function GetNetwork(aMatrix: TReal2DArray; nhid1, nhid2, nhid3, NHidnext, NHidLayersCount: Cardinal)
+  : MultiLayerPerceptron;
 begin
-  mlpcreateb3(Length(aMatrix[0]) - 1, nhid1, nhid2, nhid3, 1, 0, 0, result);
+  // mlpcreateb3(Length(aMatrix[0]) - 1, nhid1, nhid2, nhid3, 1, 0, 0, result);
+  MLPCreateB3_N(Length(aMatrix[0]) - 1, nhid1, nhid2, nhid3, NHidnext, NHidLayersCount, 1, 0, 0, result);
 end;
 
 procedure TForm1.ApplyNetworkRadiusXThrd(aRadius: word);
@@ -509,7 +513,7 @@ begin
   begin
     FillNetworkParameters;
 
-    RunTraining(2, Fnhid1, Fnhid2, Fnhid3, true, FDecay, FRestart, Fwstep, FMaxIts);
+    RunTraining(2, Fnhid1, Fnhid2, Fnhid3, FNHidnext, FNHidLayersCount, true, FDecay, FRestart, Fwstep, FMaxIts);
   end;
 end;
 
@@ -519,7 +523,7 @@ begin
   begin
     FillNetworkParameters;
 
-    RunTraining(3, Fnhid1, Fnhid2, Fnhid3, true, FDecay, FRestart, Fwstep, FMaxIts);
+    RunTraining(3, Fnhid1, Fnhid2, Fnhid3, FNHidnext, FNHidLayersCount, true, FDecay, FRestart, Fwstep, FMaxIts);
   end;
 end;
 
@@ -558,7 +562,7 @@ begin
   begin
     FillNetworkParameters;
 
-    RunTraining(4, Fnhid1, Fnhid2, Fnhid3, true, FDecay, FRestart, Fwstep, FMaxIts);
+    RunTraining(4, Fnhid1, Fnhid2, Fnhid3, FNHidnext, FNHidLayersCount, true, FDecay, FRestart, Fwstep, FMaxIts);
   end;
 end;
 
@@ -568,7 +572,7 @@ begin
   begin
     FillNetworkParameters;
 
-    RunTraining(5, Fnhid1, Fnhid2, Fnhid3, true, FDecay, FRestart, Fwstep, FMaxIts);
+    RunTraining(5, Fnhid1, Fnhid2, Fnhid3, FNHidnext, FNHidLayersCount, true, FDecay, FRestart, Fwstep, FMaxIts);
   end;
 end;
 
@@ -649,6 +653,8 @@ begin
   Fnhid1 := StrToInt(SetNetworkParametersForm.edNHID1.Text);
   Fnhid2 := StrToInt(SetNetworkParametersForm.edNHID2.Text);
   Fnhid3 := StrToInt(SetNetworkParametersForm.edNHID3.Text);
+  FNHidnext := StrToInt(SetNetworkParametersForm.edNHIDnext.Text);
+  FNHidLayersCount := StrToInt(SetNetworkParametersForm.edNHIDLayersCount.Text);
   FDecay := StrToFloat(StrAsValue(SetNetworkParametersForm.edDecay.Text));
   FRestart := StrToInt(SetNetworkParametersForm.edRestarts.Text);
   Fwstep := StrToFloat(StrAsValue(SetNetworkParametersForm.edWStep.Text));
@@ -735,8 +741,8 @@ begin
 
 end;
 
-function TForm1.RunTraining(aRadius: byte; nhid1, nhid2, nhid3: Cardinal; aDoRandomize: Boolean;
-  aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer): Boolean;
+function TForm1.RunTraining(aRadius: byte; nhid1, nhid2, nhid3, NHidnext, NHidLayersCount: Cardinal;
+  aDoRandomize: Boolean; aDecay: double; aRestart: Integer; awstep: double; aMaxIts: Integer): Boolean;
 var
   i: Integer;
   zNetworkCopy: MultiLayerPerceptron;
@@ -747,14 +753,14 @@ begin
   begin
     if (Length(FNetwork.Weights) > 0) then
       MLPFree(FNetwork);
-    FFileName := Format('%sradius_%d_nhid1_%d_nhid2_%d_nhid3_%d', [
-      ExtractFilePath(ParamStr(0)), aRadius, nhid1, nhid2, nhid3]);
+    FFileName := Format('%sradius_%d_nhid1_%d_nhid2_%d_nhid3_%d_nhidnext_%d_nhidlayerscount_%d', [
+      ExtractFilePath(ParamStr(0)), aRadius, nhid1, nhid2, nhid3, NHidnext, NHidLayersCount]);
     SetLength(FMatrix, 0);
     TrainProgressForm.FTrainMode := tmRun;
     Screen.Cursor := crHourGlass;
     FMatrix := GetMatrix(DXDIBAfterEffect.DIB, DXDIBSrc.DIB, rect(aRadius, aRadius, 
       DXDIBSrc.DIB.Width - aRadius - 1, DXDIBSrc.DIB.Height - aRadius - 1), aRadius);
-    FNetworkSrc := GetNetwork(FMatrix, nhid1, nhid2, nhid3);
+    FNetworkSrc := GetNetwork(FMatrix, nhid1, nhid2, nhid3, NHidnext, NHidLayersCount);
     for i := 0 to ProcessorCount - 1 do
     begin
       MLPCopy(FNetworkSrc, zNetworkCopy);
