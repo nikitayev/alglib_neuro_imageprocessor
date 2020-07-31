@@ -3,8 +3,8 @@ unit U_NeuralTrainerThread;
 interface
 
 uses
-  Windows, SysUtils, System.Classes, 
-  //XALGLIB,
+  Windows, SysUtils, System.Classes,
+  // XALGLIB,
   Ap, mlpbase, mlptrain,
   U_WMUtils, SyncObjs;
 
@@ -94,10 +94,16 @@ begin
   Fwstep := awstep;
   FMaxIts := aMaxIts;
   new(FIsTerminated);
+  FIsTerminated^ := false;
   inherited Create;
 end;
 
 procedure TNeuralTrainerThread.Execute;
+{ var
+  i: Integer;
+  zNetworkTmp: MultiLayerPerceptron;
+  zBestError, zCurrError: AlglibFloat;
+  zItsCount: Cardinal; }
 begin
   { Place thread code here }
   if (FDoRandomize) then
@@ -106,9 +112,70 @@ begin
     mlprandomize(FNetwork);
   end;
 
-  // mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
-  mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), FDecay, FRestart, Fwstep, FMaxIts, info, rep, FIsTerminated, rep.rmserror);
-  //rep.rmserror := mlprmserror(FNetwork, FMatrix, Length(FMatrix));
+  { алгоритм оказался неэффективным
+    zItsCount := 0;
+    zBestError := MLPRMSError(FNetwork, FMatrix, Length(FMatrix));
+    // mlptrainlm(FNetwork, FMatrix, Length(FMatrix), 0.001, 1, info, rep);
+    
+    for i := 1 to FMaxIts do
+    begin
+    MLPCopy(FNetwork, zNetworkTmp);
+    mlptrainlbfgs(zNetworkTmp, FMatrix, Length(FMatrix), 1, 1, Fwstep, 2, info, rep, FIsTerminated, zCurrError);
+    zItsCount := zItsCount + rep.NGrad;
+    zCurrError := MLPRMSError(zNetworkTmp, FMatrix, Length(FMatrix));
+    if (zCurrError < zBestError) then
+    begin
+    MLPCopy(zNetworkTmp, FNetwork);
+    zBestError := zCurrError;
+    end
+    else
+    begin
+    MLPCopy(FNetwork, zNetworkTmp);
+    mlptrainlbfgs(zNetworkTmp, FMatrix, Length(FMatrix), 0.1, 1, Fwstep, 2, info, rep, FIsTerminated, zCurrError);
+    zItsCount := zItsCount + rep.NGrad;
+    zCurrError := MLPRMSError(zNetworkTmp, FMatrix, Length(FMatrix));
+    if (zCurrError < zBestError) then
+    begin
+    MLPCopy(zNetworkTmp, FNetwork);
+    zBestError := zCurrError;
+    end
+    else
+    begin 
+    MLPCopy(FNetwork, zNetworkTmp);
+    mlptrainlbfgs(zNetworkTmp, FMatrix, Length(FMatrix), 0.01, 1, Fwstep, 2, info, rep, FIsTerminated, zCurrError);
+    zItsCount := zItsCount + rep.NGrad;
+    zCurrError := MLPRMSError(zNetworkTmp, FMatrix, Length(FMatrix));
+    if (zCurrError < zBestError) then
+    begin
+    MLPCopy(zNetworkTmp, FNetwork);
+    zBestError := zCurrError;
+    end
+    else
+    begin
+    MLPCopy(FNetwork, zNetworkTmp);
+    mlptrainlbfgs(zNetworkTmp, FMatrix, Length(FMatrix), 0.001, 1, Fwstep, 2, info, rep, FIsTerminated, zCurrError);
+    zItsCount := zItsCount + rep.NGrad;
+    zCurrError := MLPRMSError(zNetworkTmp, FMatrix, Length(FMatrix));
+    if (zCurrError < zBestError) then
+    begin
+    MLPCopy(zNetworkTmp, FNetwork);
+    zBestError := zCurrError;
+    end
+    else
+    begin
+    break;
+    end;
+    end;
+    end;
+    end;
+    end;
+
+    MLPFree(zNetworkTmp);
+    rep.rmserror := zBestError;
+    rep.NGrad := zItsCount; 
+  }
+  mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), FDecay, 1, Fwstep, FMaxIts, info, rep, FIsTerminated, rep.rmserror);
+
   SetLength(FMatrix, 0);
   PostMessage(Application.MainForm.Handle, WM_EndOfTrain, NativeUInt(Self), 0);
   dispose(FIsTerminated);

@@ -114,8 +114,6 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Kind = bkCancel
     NumGlyphs = 2
     TabOrder = 2
-    ExplicitLeft = 310
-    ExplicitTop = 200
   end
   object BitBtn2: TBitBtn
     Left = 255
@@ -126,8 +124,6 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Kind = bkOK
     NumGlyphs = 2
     TabOrder = 3
-    ExplicitLeft = 214
-    ExplicitTop = 200
   end
   object edDecay: TEdit
     Left = 256
@@ -136,7 +132,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 4
-    Text = '0.01'
+    Text = '1'
   end
   object edRestarts: TEdit
     Left = 256
@@ -163,7 +159,7 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Height = 21
     NumbersOnly = True
     TabOrder = 7
-    Text = '30'
+    Text = '100'
   end
   object edNHID3: TEdit
     Left = 256
@@ -183,7 +179,6 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Caption = #1084#1103#1075#1082#1080#1077
     TabOrder = 9
     OnClick = btSettingsSoftClick
-    ExplicitTop = 312
   end
   object btSettingsPrecission: TButton
     Left = 16
@@ -194,7 +189,6 @@ object SetNetworkParametersForm: TSetNetworkParametersForm
     Caption = #1090#1086#1095#1085#1099#1077
     TabOrder = 10
     OnClick = btSettingsPrecissionClick
-    ExplicitTop = 332
   end
   object edNHIDnext: TEdit
     Left = 255

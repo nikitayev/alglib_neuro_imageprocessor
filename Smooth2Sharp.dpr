@@ -4,9 +4,7 @@
 program Smooth2Sharp;
 
 uses
-  {$IFDEF DEBUG}
   FastMM4,
-  {$ENDIF }
   Vcl.Forms,
   main in 'main.pas' {Form1},
   U_VectorList in 'U_VectorList.pas',

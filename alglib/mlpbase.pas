@@ -1174,7 +1174,7 @@ begin
   MLPProperties(Network, NIn, NOut, WCount);
   for I := 0 to WCount - 1 do
   begin
-    Network.Weights[I] := RandomReal - 0.5;
+    Network.Weights[I] := 2 * RandomReal - 1;
   end;
 end;
 

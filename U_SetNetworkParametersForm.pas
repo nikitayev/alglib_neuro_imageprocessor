@@ -51,10 +51,10 @@ begin
   edNHID1.Text := IntToStr(max(StrToInt(edNHID1.Text), 30));
   edNHID2.Text := IntToStr(max(StrToInt(edNHID2.Text), 30));
   edNHID3.Text := IntToStr(max(StrToInt(edNHID3.Text), 10));
-  edDecay.Text := '0.001';
+  edDecay.Text := '0.1';
   edRestarts.Text := '1';
   edWStep.Text := '0';
-  edIts.Text := '300';
+  edIts.Text := '500';
 end;
 
 procedure TSetNetworkParametersForm.btSettingsSoftClick(Sender: TObject);
@@ -62,10 +62,10 @@ begin
   edNHID1.Text := IntToStr(max(StrToInt(edNHID1.Text), 30));
   edNHID2.Text := IntToStr(max(StrToInt(edNHID2.Text), 30));
   edNHID3.Text := IntToStr(max(StrToInt(edNHID3.Text), 10));
-  edDecay.Text := '0.01';
+  edDecay.Text := '1';
   edRestarts.Text := '1';
   edWStep.Text := '0';
-  edIts.Text := '30';
+  edIts.Text := '100';
 end;
 
 end.

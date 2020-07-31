@@ -638,7 +638,7 @@ begin
     //
     // Compare with best
     //
-    //V := APVDotProduct(@Network.Weights[0], 0, WCount - 1, @Network.Weights[0], 0, WCount - 1);
+    // V := APVDotProduct(@Network.Weights[0], 0, WCount - 1, @Network.Weights[0], 0, WCount - 1);
     E := MLPRMSError(Network, XY, NPoints);
     if AP_FP_Less(E, EBest) then
     begin
@@ -1571,8 +1571,8 @@ begin
   FRestarts := Restarts;
   FWStep := WStep;
   FMaxIts := MaxIts;
-  //FInfo := @Info;
-  //FRep := @Rep;
+  // FInfo := @Info;
+  // FRep := @Rep;
   FIsTerminated := IsTerminated;
 
   inherited Create;
