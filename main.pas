@@ -201,6 +201,8 @@ begin
   zRealRect.Top := aRect.Top + aRadius;
   zRealRect.Right := aRect.Right - aRadius;
   zRealRect.Bottom := aRect.Bottom - aRadius;
+  aDIBSrc.Greyscale(8);
+  aDIBAfterEffect.Greyscale(8);
 
   zVectorList := TVectorList.Create;
 
