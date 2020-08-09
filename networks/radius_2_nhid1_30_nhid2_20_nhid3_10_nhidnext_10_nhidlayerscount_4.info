@@ -4,3 +4,4 @@ time: 08.08.2020 20:13:54, info: 2, rmserror: 1,92171006178549E+001, ngrad: 92, 
 time: 08.08.2020 20:40:05, info: 2, rmserror: 1,86634340917859E+001, ngrad: 92, nhess: 0, ncholesky: 0
 time: 08.08.2020 23:32:10, info: 2, rmserror: 1,85626810768727E+001, ngrad: 92, nhess: 0, ncholesky: 0
 time: 09.08.2020 7:26:45, info: 2, rmserror: 1,45978913793691E+001, ngrad: 373, nhess: 0, ncholesky: 0
+time: 09.08.2020 8:43:05, info: 2, rmserror: 1,41792247718291E+001, ngrad: 366, nhess: 0, ncholesky: 0
