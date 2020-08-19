@@ -1,0 +1,4 @@
+time: 19.08.2020 0:05:32, info: 2, rmserror: 1,83736874091517E+001, ngrad: 87, nhess: 0, ncholesky: 0
+time: 19.08.2020 0:06:07, info: 2, rmserror: 1,74615695502861E+001, ngrad: 88, nhess: 0, ncholesky: 0
+time: 19.08.2020 9:30:58, info: 2, rmserror: 1,11740363289118E+001, ngrad: 374, nhess: 0, ncholesky: 0
+time: 19.08.2020 13:16:25, info: 2, rmserror: 1,03801386598030E+001, ngrad: 370, nhess: 0, ncholesky: 0
