@@ -13,3 +13,4 @@ time: 31.08.2020 17:19:46, info: 2, rmserror: 1,10077610228329E+001, ngrad: 566,
 time: 01.09.2020 17:25:01, info: 2, rmserror: 1,05570505181629E+001, ngrad: 959, nhess: 0, ncholesky: 0
 time: 02.09.2020 15:52:44, info: 2, rmserror: 1,04217310479449E+001, ngrad: 381, nhess: 0, ncholesky: 0
 time: 03.09.2020 9:23:32, info: 2, rmserror: 1,02367599987276E+001, ngrad: 574, nhess: 0, ncholesky: 0
+time: 03.09.2020 15:55:11, info: 2, rmserror: 1,01875860343379E+001, ngrad: 198, nhess: 0, ncholesky: 0
