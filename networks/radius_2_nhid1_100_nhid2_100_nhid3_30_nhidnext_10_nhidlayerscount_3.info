@@ -11,3 +11,5 @@ time: 30.08.2020 6:29:39, info: 2, rmserror: 1,19079024735334E+001, ngrad: 581, 
 time: 31.08.2020 0:26:59, info: 2, rmserror: 1,13910917430730E+001, ngrad: 568, nhess: 0, ncholesky: 0
 time: 31.08.2020 17:19:46, info: 2, rmserror: 1,10077610228329E+001, ngrad: 566, nhess: 0, ncholesky: 0
 time: 01.09.2020 17:25:01, info: 2, rmserror: 1,05570505181629E+001, ngrad: 959, nhess: 0, ncholesky: 0
+time: 02.09.2020 15:52:44, info: 2, rmserror: 1,04217310479449E+001, ngrad: 381, nhess: 0, ncholesky: 0
+time: 03.09.2020 9:23:32, info: 2, rmserror: 1,02367599987276E+001, ngrad: 574, nhess: 0, ncholesky: 0
