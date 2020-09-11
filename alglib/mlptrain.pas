@@ -621,7 +621,7 @@ begin
     if (Restarts > 1) then // do randomize if restarts > 1
       MLPRandomize(Network);
     APVMove(@W[0], 0, WCount - 1, @Network.Weights[0], 0, WCount - 1);
-    MinLBFGSCreate(WCount, Min(WCount, 10), W, State);
+    MinLBFGSCreate(WCount, Min(WCount, 20), W, State);
     MinLBFGSSetCond(State, 0.0, 0.0, WStep, MaxIts);
     while not IsTerminated^ and MinLBFGSIteration(State) do
     begin
