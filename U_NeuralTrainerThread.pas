@@ -175,6 +175,8 @@ begin
     rep.NGrad := zItsCount; 
   }
   mlptrainlbfgs(FNetwork, FMatrix, Length(FMatrix), FDecay, 1, Fwstep, FMaxIts, info, rep, FIsTerminated, rep.rmserror);
+  //MLPTrainLM(FNetwork, FMatrix, Length(FMatrix), FDecay, 1, info, rep);
+  rep.rmserror := MLPRMSError(FNetwork, FMatrix, Length(FMatrix));
 
   SetLength(FMatrix, 0);
   PostMessage(Application.MainForm.Handle, WM_EndOfTrain, NativeUInt(Self), 0);
